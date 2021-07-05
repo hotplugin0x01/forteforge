@@ -49,6 +49,7 @@
             <div class="px-5 m-3 my-4">
                 <h5>Login</h5>
             </div>
+            {{ message }}
             <form action="{% url 'login' %}" method="POST">
                 {% csrf_token %}
                 <div class="form-group px-5 m-3">

@@ -1,6 +1,6 @@
 from learning.models import Student
 from django.shortcuts import redirect, render, HttpResponse
-# from . import forms
+from django.contrib.auth import authenticate, login
 from .forms import ProfileForm,UserForm,EnterpriseForm
 from django.views.decorators.csrf import csrf_exempt
 
@@ -8,10 +8,41 @@ from django.views.decorators.csrf import csrf_exempt
 @csrf_exempt
 def login(request):
     if request.method == 'POST':
-        return HttpResponse("<h1>Logged In</h1>")
+        form = UserForm(request.POST)
+        if form.is_valid():
+            email = form.cleaned_data['email']
+            password = form.cleaned_data['password']
+            user = authenticate(request, email=email, password=password)
+            if user is not None:
+                login(request, user)
+                return HttpResponse("<h1>Logged In</h1>")
+            message="Incorrect Credentials"
+            form=UserForm()
+        return render(request, 'learning/login.html', {'form':form,"message":message})
+            
     else:
         form = UserForm()
         return render(request, 'learning/login.html', {'form':form})
+
+
+def login_view(request):
+    if request.method=="POST":
+        print(request.POST)
+        form = LoginForm(data=request.POST)
+        if form.is_valid():
+            print("form valid")
+            username=form.cleaned_data['username']
+            password=form.cleaned_data['password']
+            print(username,password)
+            # user=User.objects.filter(username=username)[0]
+            if user is not None:
+                print("verified")
+                login(request,user)
+                return redirect('index')
+    else:
+        form = LoginForm()
+    return render(request,"uno_startup/login.html",{"form":form})  
+    
 
 @csrf_exempt
 def signup(request):
