@@ -1,7 +1,7 @@
 from learning.models import Student
 from django.shortcuts import redirect, render, HttpResponse
 # from . import forms
-from .forms import ProfileForm,UserForm
+from .forms import ProfileForm,UserForm,EnterpriseForm
 from django.views.decorators.csrf import csrf_exempt
 
 # Create your views here.
@@ -29,3 +29,20 @@ def signup(request):
         userform = UserForm()
         profileform = ProfileForm()
     return render(request, 'learning/signup.html', {'userform':userform, 'profileform':profileform})
+
+@csrf_exempt
+def signupEnterprise(request):
+    if request.method == 'POST':
+        userform = UserForm(request.POST)
+        enterpriseform = EnterpriseForm(request.POST)
+        if userform.is_valid() and enterpriseform.is_valid():
+            user = userform.save()
+            enterprise = enterpriseform.save(user)
+            return HttpResponse("<h1>Signed Up</h1>")
+        else:
+            print(enterpriseform.data)
+            raise Exception (f"Profile form not valid {enterpriseform.is_valid()}")
+    else:
+        enterprise = EnterpriseForm()
+        user = UserForm()
+        return render(request, 'learning/signup_enterprise.html', {'enterprise':enterprise, 'user':user})
